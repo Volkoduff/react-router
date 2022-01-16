@@ -99,3 +99,12 @@ typings/
 out
 gen
 f
+
+# build files
+build/
+
+# firebase config and files
+.firebase/
+.firebaserc
+firebase.json
+
