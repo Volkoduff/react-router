@@ -27,7 +27,6 @@ const NewCommentForm = (props) => {
             }, quoteId: quoteId
         });
 
-
         // optional: Could validate here
     };
 
