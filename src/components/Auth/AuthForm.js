@@ -1,5 +1,7 @@
-import {useState, useRef, useEffect} from 'react';
+import {useState, useRef, useEffect, useContext} from 'react';
+import { useHistory } from "react-router-dom";
 import classes from './AuthForm.module.css';
+import AuthContext from "../../store/auth-context";
 
 const API_KEY = 'AIzaSyDGQy6mk2Mo-HA70WCC_B24-Wi3B7kKQYc';
 const LOGIN_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${API_KEY}`;
@@ -12,12 +14,14 @@ const AuthForm = () => {
     const emailInputRef = useRef();
     const passwordInputRef = useRef();
     const [isLogin, setIsLogin] = useState(false);
+    const authCtx = useContext(AuthContext);
+    const history = useHistory();
 
     const switchAuthModeHandler = () => {
         setIsLogin((prevState) => !prevState);
     };
 
-    const submitHandler = (evt) => {
+    const submitHandler = async (evt) => {
         evt.preventDefault();
         const enteredEmail = emailInputRef.current.value;
         const enteredPassword = passwordInputRef.current.value;
@@ -25,7 +29,7 @@ const AuthForm = () => {
         setIsLoading(true);
         const url = isLogin ? LOGIN_URL : SIGN_UP_URL;
 
-        fetch(url, {
+        const response = await fetch(url, {
             method: "POST",
             body: JSON.stringify({
                 email: enteredEmail,
@@ -35,27 +39,23 @@ const AuthForm = () => {
             headers: {
                 'Content-Type': 'application/json',
             }
-        }).then((res) => {
-            setIsLoading(false);
-            if (res.ok) {
-                return res.json();
-            } else {
-                return res.json().then((data) => {
-                    let errorMessage = 'Authentication failed';
-                    if (data && data.error && data.error.message) {
-                        errorMessage = data.error.message;
-                    }
-                    alert(errorMessage)
-                  throw new Error(errorMessage)
-                    // setIsError(true);
-                    // setErrorMessage(errorMessage);
-                })
-            }
-        }).then((data) => {
-          console.log(data)
-        }).catch(error => {
-          alert(error)
         })
+
+        setIsLoading(false);
+
+        if (response.ok) {
+            const { idToken } = await response.json();
+            authCtx.login(idToken);
+            history.replace('/');
+        } else {
+            const data = await response.json();
+            let errorMessage = 'Authentication failed';
+            if (data && data.error && data.error.message) {
+                errorMessage = data.error.message;
+            }
+            alert(errorMessage)
+            throw new Error(errorMessage)
+        }
     };
 
     return (
@@ -68,7 +68,7 @@ const AuthForm = () => {
                 </div>
                 <div className={classes.control}>
                     <label htmlFor='password'>Your Password</label>
-                    <input type='password' id='password' ref={passwordInputRef} required/>
+                    <input type='password' minLength="7" id='password' ref={passwordInputRef} required/>
                 </div>
                 <div className={classes.actions}>
                     {!isLoading && <button>{isLogin ? 'Login' : 'Create Account'}</button>}

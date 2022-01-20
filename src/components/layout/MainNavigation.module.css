@@ -13,9 +13,21 @@
   color: white;
 }
 
+.nav button {
+  border: none;
+  font-size: 20px;
+  background-color: #029898;
+  padding: 6px 18px;
+  border-radius: 6px;
+  color: #88dfdf;
+  box-shadow: 0 0 0 1px #c1efef;
+  cursor: pointer;
+}
+
 .nav ul {
   list-style: none;
   display: flex;
+  align-items: center;
   margin: 0;
   padding: 0;
 }
