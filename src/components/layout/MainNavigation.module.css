@@ -24,6 +24,11 @@
   cursor: pointer;
 }
 
+.nav button:hover {
+    color: #97e8e8;
+  background-color: #03a9a9;
+}
+
 .nav ul {
   list-style: none;
   display: flex;

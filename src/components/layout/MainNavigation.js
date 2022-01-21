@@ -8,6 +8,10 @@ const MainNavigation = () => {
     const authCtx = useContext(AuthContext);
     const isLoggedIn = authCtx.isLoggedIn;
 
+    const logoutHandler = () => {
+        authCtx.logout();
+    };
+
     return <header className={classes.header}>
         <Link to='/'>
             <div className={classes.logo}>Great Quotes</div>
@@ -31,7 +35,7 @@ const MainNavigation = () => {
                             <NavLink to='/new-quote' activeClassName={classes.active}>Add a quote</NavLink>
                         </li>
                         <li>
-                            <button>Logout</button>
+                            <button onClick={logoutHandler}>Logout</button>
                         </li>
                     </React.Fragment>
                 )}

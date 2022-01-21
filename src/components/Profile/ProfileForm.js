@@ -1,9 +1,12 @@
 import {useContext, useRef} from "react";
+import { useHistory } from "react-router-dom";
 import classes from './ProfileForm.module.css';
 import AuthContext from "../../store/auth-context";
 const API_KEY = 'AIzaSyDGQy6mk2Mo-HA70WCC_B24-Wi3B7kKQYc';
 const PASSWORD_RESET_URL = `https://identitytoolkit.googleapis.com/v1/accounts:update?key=${API_KEY}`
+
 const ProfileForm = () => {
+    const history = useHistory();
     const authCtx = useContext(AuthContext);
     const newPasswordInputRef = useRef();
     const submitHandler = async (evt) => {
@@ -24,7 +27,7 @@ const ProfileForm = () => {
 
         if (response.ok) {
             const data = await response.json()
-            debugger
+            history.replace('/')
         } else {
             const data = await response.json()
             alert(data.error)

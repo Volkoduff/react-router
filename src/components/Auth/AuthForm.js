@@ -1,4 +1,4 @@
-import {useState, useRef, useEffect, useContext} from 'react';
+import { useState, useRef, useContext } from 'react';
 import { useHistory } from "react-router-dom";
 import classes from './AuthForm.module.css';
 import AuthContext from "../../store/auth-context";
@@ -8,8 +8,6 @@ const LOGIN_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signInWith
 const SIGN_UP_URL = `https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=${API_KEY}`;
 
 const AuthForm = () => {
-    // const [isError, setIsError] = useState(false);
-    // const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const emailInputRef = useRef();
     const passwordInputRef = useRef();
@@ -27,7 +25,7 @@ const AuthForm = () => {
         const enteredPassword = passwordInputRef.current.value;
 
         setIsLoading(true);
-        const url = isLogin ? LOGIN_URL : SIGN_UP_URL;
+        const url = isLogin ? SIGN_UP_URL : LOGIN_URL;
 
         const response = await fetch(url, {
             method: "POST",
@@ -44,8 +42,10 @@ const AuthForm = () => {
         setIsLoading(false);
 
         if (response.ok) {
-            const { idToken } = await response.json();
-            authCtx.login(idToken);
+            const { idToken, expiresIn } = await response.json();
+
+            const expirationTime = new Date(new Date().getTime() + (+expiresIn * 1000))
+            authCtx.login(idToken, expirationTime.toISOString() );
             history.replace('/');
         } else {
             const data = await response.json();
@@ -54,13 +54,12 @@ const AuthForm = () => {
                 errorMessage = data.error.message;
             }
             alert(errorMessage)
-            throw new Error(errorMessage)
         }
     };
 
     return (
         <section className={classes.auth}>
-            <h1>{isLogin ? 'Login' : 'Sign Up'}</h1>
+            <h1>{isLogin ? 'Sign Up' : 'Login'}</h1>
             <form onSubmit={submitHandler}>
                 <div className={classes.control}>
                     <label htmlFor='email'>Your Email</label>
@@ -71,14 +70,14 @@ const AuthForm = () => {
                     <input type='password' minLength="7" id='password' ref={passwordInputRef} required/>
                 </div>
                 <div className={classes.actions}>
-                    {!isLoading && <button>{isLogin ? 'Login' : 'Create Account'}</button>}
+                    {!isLoading && <button>{!isLogin ? 'Login' : 'Create Account'}</button>}
                     {isLoading && <p className={classes['error-message']}>Loading...</p>}
                     <button
                         type='button'
                         className={classes.toggle}
                         onClick={switchAuthModeHandler}
                     >
-                        {isLogin ? 'Create new account' : 'Login with existing account'}
+                        {isLogin ? 'Login with existing account' : 'Create new account'}
                     </button>
                 </div>
             </form>
