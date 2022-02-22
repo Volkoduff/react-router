@@ -22,6 +22,7 @@ export async function getAllQuotes() {
   return transformedQuotes;
 }
 
+
 export async function getSingleQuote(quoteId) {
   const response = await fetch(`${FIREBASE_DOMAIN}/quotes/${quoteId}.json`);
   const data = await response.json();
